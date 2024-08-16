@@ -4,6 +4,11 @@ pipeline {
     environment {
         MAVEN_ARGS = "-e clean install"
         DOCKER_IMAGE = "iamsamitdev/springboot-app-jenkins:latest"
+        // Windows 
+        // KUBE_CONFIG_PATH = 'C:\\Users\\samit\\.kube\\config' 
+        // Linux & MacOS  
+        KUBE_CONFIG_PATH = '/Users/samit/.kube/config'
+        KUBE_NAMESPACE = 'default'
     }
 
     stages {
@@ -51,6 +56,17 @@ pipeline {
                         sh "echo ${DOCKERHUB_PASSWORD} | docker login -u iamsamitdev --password-stdin"
                         sh "docker push ${DOCKER_IMAGE}"
                     }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                withEnv(["PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin"]) {
+                    // ใช้ kubectl apply เพื่อ deploy หรืออัปเดต resource ใน Kubernetes จาก deployment.yaml
+                    sh "kubectl --kubeconfig=${KUBE_CONFIG_PATH} apply -f deployment.yaml -n ${KUBE_NAMESPACE}"
+                    
+                    // ตรวจสอบสถานะของ deployment
+                    sh "kubectl --kubeconfig=${KUBE_CONFIG_PATH} rollout status deployment/springboot-app -n ${KUBE_NAMESPACE}"
                 }
             }
         }
