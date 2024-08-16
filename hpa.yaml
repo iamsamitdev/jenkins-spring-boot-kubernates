@@ -1,0 +1,38 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: springboot-app
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 30 # 30% of the CPU
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80 # 80% of the memory
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0 # 0 seconds กำหนดช่วงเวลาที่ HPA จะต้องรอหลังจากที่มีการตรวจพบว่าต้องเพิ่มจำนวน Pods ก่อนที่จะทำการ scale จริง. ในกรณีนี้ ตั้งค่าเป็น 0 หมายความว่า HPA จะทำการ scale up ทันทีที่ตรวจพบว่าต้องเพิ่มจำนวน Pods โดยไม่มีการรอคอย
+      policies:
+      - type: Pods # type: Pods: กำหนดให้การเพิ่มจำนวน Pods นั้นเป็นจำนวนคงที่ (fixed number of Pods)
+        value: 1 # ตัวอย่างเช่น ถ้าปัจจุบันมี 5 Pods, การเพิ่มจำนวน Pods จะเพิ่มเป็น 6 Pods
+        periodSeconds: 15 # จะตรวจสอบทุกๆ 15 วินาทีว่าควรเพิ่มจำนวน Pods หรือไม่ โดยแต่ละ Pods จะถูกเพิ่มทีละ 1 Pods
+    scaleDown:
+      stabilizationWindowSeconds: 30 # 30 seconds สำหรับการ scale down, stabilizationWindowSeconds ถูกตั้งไว้ที่ 60 วินาที ซึ่งหมายความว่า HPA จะรอ 60 วินาทีหลังจากตรวจพบว่าโหลดลดลงก่อนที่จะลดจำนวน Pods
+      policies:
+      - type: Pods # type: Pods: กำหนดให้การลดจำนวน Pods นั้นเป็นจำนวนคงที่ (fixed number of Pods)
+        value: 5 # ตัวอย่างเช่น ถ้าปัจจุบันมี 6 Pods, การลดจำนวน Pods จะลดเป็น 1 Pods
+        periodSeconds: 30 # จะตรวจสอบทุกๆ 30 วินาทีว่าควรลดจำนวน Pods หรือไม่ โดยแต่ละ Pods จะถูกลดทีละ 5 Pods
