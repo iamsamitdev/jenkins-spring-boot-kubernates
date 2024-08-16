@@ -36,6 +36,24 @@ pipeline {
                 }
             }
         }
+        stage('Push Docker Image') {
+            steps {
+                // Login เข้า Docker Hub และ push Docker image ที่สร้างขึ้น
+                // Windows
+                // withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKERHUB_PASSWORD')]) {
+                //     bat "docker login -u iamsamitdev -p %DOCKERHUB_PASSWORD%"
+                //     bat "docker push ${DOCKER_IMAGE}"
+                // }
+
+                // Linux & MacOS
+                withCredentials([string(credentialsId: 'dockerhub-credentials', variable: 'DOCKERHUB_PASSWORD')]) {
+                    withEnv(["PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin"]) {
+                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u iamsamitdev --password-stdin"
+                        sh "docker push ${DOCKER_IMAGE}"
+                    }
+                }
+            }
+        }
 
     }
 
