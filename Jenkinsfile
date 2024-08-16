@@ -6,6 +6,14 @@ pipeline {
     }
 
     stages {
+
+        // Test Clone Repository
+        stage('Clone Repository') {
+            steps {
+                sh 'git clone https://github.com/iamsamitdev/jenkins-spring-boot-kubernates.git'
+            }
+        }
+
         stage('Build Maven Project') {
             steps {
                 withMaven(maven: 'MAVEN_HOME') {
