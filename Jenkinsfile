@@ -24,14 +24,16 @@ pipeline {
         // }
         stage('Build Docker Image') {
             steps {
-                // สร้าง Docker image จาก Dockerfile ที่อยู่ใน project
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                withEnv(["PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin"]) {
+                    // สร้าง Docker image จาก Dockerfile ที่อยู่ใน project
+                    sh "docker build -t ${DOCKER_IMAGE} ."
 
-                // ลบ dangling images (images ที่ไม่มี tag)
-                sh "docker image prune -f"
+                    // ลบ dangling images (images ที่ไม่มี tag)
+                    sh "docker image prune -f"
 
-                // แสดงรายชื่อ Docker images ทั้งหมดที่มีอยู่หลังจาก build เสร็จ
-                sh "docker images"
+                    // แสดงรายชื่อ Docker images ทั้งหมดที่มีอยู่หลังจาก build เสร็จ
+                    sh "docker images"
+                }
             }
         }
 
