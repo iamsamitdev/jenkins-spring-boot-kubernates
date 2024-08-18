@@ -17,12 +17,12 @@ spec:
       target:
         type: Utilization
         averageUtilization: 30 # 30% of the CPU
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80 # 80% of the memory
+  # - type: Resource
+  #   resource:
+  #     name: memory
+  #     target:
+  #       type: Utilization
+  #       averageUtilization: 80 # 80% of the memory
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0 # 0 seconds กำหนดช่วงเวลาที่ HPA จะต้องรอหลังจากที่มีการตรวจพบว่าต้องเพิ่มจำนวน Pods ก่อนที่จะทำการ scale จริง. ในกรณีนี้ ตั้งค่าเป็น 0 หมายความว่า HPA จะทำการ scale up ทันทีที่ตรวจพบว่าต้องเพิ่มจำนวน Pods โดยไม่มีการรอคอย
